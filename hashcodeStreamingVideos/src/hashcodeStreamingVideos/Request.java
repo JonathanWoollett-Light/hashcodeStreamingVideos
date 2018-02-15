@@ -1,12 +1,14 @@
 package hashcodeStreamingVideos;
 
 public class Request {
-	private int number;
-	private int video;
+	private final int number;
+	private final int video;
+	private final double priority;
 	
 	public Request(int number, int video, int videoSize) {
 		this.number = number;
 		this.video = video;
+		priority = videoSize / number;
 	}
 	
 	public int getNumber() {
@@ -14,5 +16,8 @@ public class Request {
 	}
 	public int getVideo() {
 		return video;
+	}
+	public double getPriority() {
+		return priority;
 	}
 }

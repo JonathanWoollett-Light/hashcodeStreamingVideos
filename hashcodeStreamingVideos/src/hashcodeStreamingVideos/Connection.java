@@ -8,6 +8,9 @@ public class Connection {
 		this.latency = latency;
 		this.cache = cache;
 		this.endpoint = endpoint;
-		
+	}
+	
+	public Endpoint getEndpoint() {
+		return endpoint;
 	}
 }
