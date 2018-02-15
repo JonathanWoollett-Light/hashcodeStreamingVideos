@@ -17,8 +17,8 @@ public class Endpoint {
 	public Request[] getRequests() {
 		return requests;
 	}
-	public int[] getVideoPriorities() {
-		int videoPriorities[] = new int[requests.length];
+	public double[] getVideoPriorities() {
+		double videoPriorities[] = new double[requests.length];
 		for(int i=0;i<requests.length;i++) {
 			videoPriorities[requests[i].getVideo()] = requests[i].getPriority();
 		}
