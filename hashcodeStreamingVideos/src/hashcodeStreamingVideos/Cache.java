@@ -29,7 +29,7 @@ public class Cache {
 	
 	public void setVideoOrder(int[] videoSizes) {
 		//setting video priorities
-		int videoPriorityHolder[];
+		double videoPriorityHolder[];
 		for(int a = 0; a < videoOrder.length; a++) {
 			for(int b = 0; b < connections.length; b++) {
 				videoPriorityHolder = connections[b].getEndpoint().getVideoPriorities();
