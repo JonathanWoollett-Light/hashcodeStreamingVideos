@@ -7,7 +7,7 @@ import java.util.Scanner;
 public class FileHandler {
     private static int[] metadata;
     private static int[] videoSizes;
-
+    private static Request[] requests;
 
     public static void openFile() {
         try {
@@ -23,8 +23,8 @@ public class FileHandler {
             setMetadata(mdata);
 
             // For testing first line read
-            System.out.println("Metadata info");
-            for(int i=0; i<metadata.length; i++) {
+            System.out.println("\nMetadata info");
+            for (int i = 0; i < metadata.length; i++) {
                 System.out.println(metadata[i]);
             }
 
@@ -33,21 +33,21 @@ public class FileHandler {
 
 
             //For testing File size read
-            System.out.println("Video sizes");
-            for(int i=0; i<videoSizes.length; i++) {
-                System.out.println("File " + i + ": " + videoSizes[i] + "MB" );
+            System.out.println("\nVideo sizes");
+            for (int i = 0; i < videoSizes.length; i++) {
+                System.out.println("File " + i + ": " + videoSizes[i] + "MB");
             }
 
 
             EndpointLatency[] latencies = readEndpointLatencies(in);
 
             //Test the read of endpoint latencies
-            System.out.println("Endpoint latencies to cache");
-            for (int i=0; i<latencies.length; i++) {
+            System.out.println("\nEndpoint latencies to cache");
+            for (int i = 0; i < latencies.length; i++) {
                 System.out.println("Endpoint " + i + ":");
                 System.out.println("Datacentre latency: " + latencies[i].getDatacentreLatency() + " MS");
-                if (latencies[i].getCacheLatency()!= null) {
-                    for (int j=0; j < latencies[i].getCacheLatency().length; j++) {
+                if (latencies[i].getCacheLatency() != null) {
+                    for (int j = 0; j < latencies[i].getCacheLatency().length; j++) {
                         //Any cache that has latency 0ms isn't connected to the endpoint
                         System.out.println("Latency to endpoint " + j + ": " + latencies[i].getCacheLatency()[j] + "MS");
                     }
@@ -56,16 +56,22 @@ public class FileHandler {
                 }
             }
 
-            readVideoRequests(in);
+            Request[] reqs = readVideoRequests(in);
+            setRequests(reqs);
 
-
+            //Test requests
+            System.out.println("\nVideo Requests");
+            for(int i=0; i < requests.length; i++) {
+                System.out.println(requests[i].getNumber() + " requests for video " + requests[i].getVideo()
+                                   + " from endpoint " + requests[i].getRequestingEndpoint());
+            }
         } catch (FileNotFoundException e) {
             System.out.println("File not found");
         }
     }
 
     //Reads in metadata from first line
-    private static int[] readMetadata(Scanner in){
+    private static int[] readMetadata(Scanner in) {
         int noOfVids = in.nextInt();
         int noOfEndpoints = in.nextInt();
         int noOfRequests = in.nextInt();
@@ -82,10 +88,10 @@ public class FileHandler {
     }
 
     //Reads size of all videos from second line
-    private static int[] readVideoSizes (Scanner in) {
+    private static int[] readVideoSizes(Scanner in) {
         int noOfVids = metadata[0];
         int[] vidSizes = new int[noOfVids];
-        for (int i=0; i < noOfVids; i++ ) {
+        for (int i = 0; i < noOfVids; i++) {
             vidSizes[i] = in.nextInt();
         }
         return vidSizes;
@@ -98,7 +104,7 @@ public class FileHandler {
         int noOfCacheServers = metadata[3];
 
         EndpointLatency[] latencies = new EndpointLatency[noOfEndpoints];
-        for (int i=0; i < noOfEndpoints; i++) {
+        for (int i = 0; i < noOfEndpoints; i++) {
             int datacentreLatency = in.nextInt();
             int noOfCaches = in.nextInt();
 
@@ -112,7 +118,7 @@ public class FileHandler {
                     tempCacheLatency[cacheIdentifier] = cacheLatency;
                 }
 
-                EndpointLatency temp = new EndpointLatency(datacentreLatency,tempCacheLatency);
+                EndpointLatency temp = new EndpointLatency(datacentreLatency, tempCacheLatency);
                 latencies[i] = temp;
             } else {
                 EndpointLatency temp = new EndpointLatency(datacentreLatency, null);
@@ -122,7 +128,7 @@ public class FileHandler {
         return latencies;
     }
 
-    private static Endpoint[] readVideoRequests(Scanner in) {
+    private static Request[] readVideoRequests(Scanner in) {
         int noOfVideos = metadata[0];
         int noOfEndpoints = metadata[1];
         int noOfVideoRequests = metadata[2];
@@ -131,16 +137,16 @@ public class FileHandler {
         Endpoint[] endpoints = new Endpoint[noOfEndpoints];
 
 
-        for (int i=0; i < noOfVideoRequests; i++) {
+        for (int i = 0; i < noOfVideoRequests; i++) {
             int videoNo = in.nextInt();
             int endpointNo = in.nextInt();
             int noOfRequests = in.nextInt();
             int vidSize = videoSizes[videoNo];
-            Request temp = new Request(noOfRequests,videoNo,vidSize);
-            //TODO Construct Endpoints
+            Request temp = new Request(noOfRequests, videoNo, vidSize, endpointNo);
+            requests[i] = temp;
 
         }
-        return endpoints;
+        return requests;
 
     }
 
@@ -148,15 +154,24 @@ public class FileHandler {
         metadata = mdata;
     }
 
-    public static int[] getMetadata() {
-        return metadata;
-    }
-
     private static void setVideoSizes(int[] vSizes) {
         videoSizes = vSizes;
     }
 
+    private static void setRequests(Request[] reqs) {
+        requests = reqs;
+    }
+
     public static int[] getVideoSizes() {
         return videoSizes;
+    }
+
+
+    public static int[] getMetadata() {
+        return metadata;
+    }
+
+    public static Request[] getRequests() {
+        return requests;
     }
 }
